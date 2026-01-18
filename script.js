@@ -1,20 +1,20 @@
 // script.js - Mandala Princess Password Game with ALPHABETICAL ORDER & LOCAL AUDIO
-// UPDATED FOR FULL RESPONSIVENESS WITH NEW DESTINATION PAGE
+// UPDATED FOR GITHUB PAGES COMPATIBILITY
 
-// Your sticker images - UPDATE THESE PATHS
+// Your sticker images - UPDATED FOR GITHUB PAGES
 const stickerImages = [
-    'images/sticker1.png',
-    'images/sticker2.png',
-    'images/sticker3.png',
-    'images/sticker4.png',
-    'images/sticker5.png',
-    'images/sticker6.png',
-    'images/sticker7.png',
-    'images/sticker8.png',
-    'images/sticker9.png',
-    'images/sticker10.png',
-    'images/sticker11.png',
-    'images/sticker12.png'
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker1.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker2.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker3.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker4.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker5.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker6.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker7.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker8.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker9.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker10.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker11.png',
+    'https://sohanamallick454-prog.github.io/birthday/images/sticker12.png'
 ];
 
 // Princess names in ALPHABETICAL ORDER (password sequence)
@@ -33,23 +33,23 @@ const princessNames = [
     "Lacey"       // 12th (SPECIAL: needs 3 clicks)
 ];
 
-// Local audio files for each princess
+// Local audio files for each princess - UPDATED PATHS
 const princessAudio = [
-    "sound/a.mp3",    // Ashlyn
-    "sound/b.mp3",    // Blair
-    "sound/c.mp3",    // Courtney
-    "sound/d.mp3",    // Deline
-    "sound/e.mp3",    // Edeline
-    "sound/f.mp3",    // Fallon
-    "sound/g.mp3",    // Genevieve
-    "sound/h.mp3",    // Hadley
-    "sound/i.mp3",    // Isla
-    "sound/j.mp3",    // Janessa
-    "sound/k.mp3",    // Kathleen
-    "sound/l.mp3"     // Lacey (will play after 3rd click)
+    "https://sohanamallick454-prog.github.io/birthday/sound/a.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/b.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/c.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/d.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/e.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/f.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/g.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/h.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/i.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/j.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/k.mp3",
+    "https://sohanamallick454-prog.github.io/birthday/sound/l.mp3"
 ];
 
-// Error and other sounds
+// Fallback sounds (using free public domain sounds)
 const soundFiles = {
     error: "https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3",
     unclick: "https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3",
@@ -77,7 +77,7 @@ const mandalaPositions = [
 const alphabeticalOrder = [10, 7, 2, 9, 1, 11, 3, 5, 0, 6, 4, 8];
 
 // NEW DESTINATION PAGE - Birthday Cake Page
-const NEXT_PAGE_URL = "cake.html";
+const NEXT_PAGE_URL = "https://sohanamallick454-prog.github.io/birthday/cake.html";
 
 // Global variables
 let clickedStickers = []; // Array to track clicked sticker IDs in alphabetical order
@@ -97,6 +97,8 @@ const countElement = document.getElementById('count');
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("Initializing Princess Game...");
+    
     // Detect device type and orientation
     detectDeviceType();
     checkOrientation();
@@ -104,7 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Adjust layout based on device
     adjustLayoutForDevice();
     
-    createStickers();
+    // Create stickers with error handling
+    try {
+        createStickers();
+    } catch (error) {
+        console.error("Error creating stickers:", error);
+        // Fallback: Create placeholder stickers
+        createFallbackStickers();
+    }
+    
     addSparkleAnimation();
     updateInstruction();
     
@@ -120,6 +130,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for responsiveness
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // Add loading screen timeout (remove if images don't load)
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen && loadingScreen.style.display !== 'none') {
+            loadingScreen.style.display = 'none';
+        }
+    }, 5000);
 });
 
 // Detect device type and set responsive variables
@@ -205,11 +223,22 @@ function adjustStickerPositions() {
 // Preload audio files for better performance
 function preloadAudioFiles() {
     console.log("Preloading audio files...");
+    // Use Promise.all to handle audio loading
+    const audioPromises = [];
+    
+    // Try to load princess audio
     princessAudio.forEach((audioUrl, index) => {
         const audio = new Audio();
         audio.src = audioUrl;
         audio.preload = 'auto';
-        audio.load();
+        
+        // Create a promise for each audio load
+        const promise = new Promise((resolve) => {
+            audio.oncanplaythrough = resolve;
+            audio.onerror = resolve; // Resolve even on error to continue
+        });
+        
+        audioPromises.push(promise);
     });
     
     // Also preload other sounds
@@ -217,12 +246,27 @@ function preloadAudioFiles() {
         const audio = new Audio();
         audio.src = url;
         audio.preload = 'auto';
-        audio.load();
+        
+        const promise = new Promise((resolve) => {
+            audio.oncanplaythrough = resolve;
+            audio.onerror = resolve;
+        });
+        
+        audioPromises.push(promise);
+    });
+    
+    // Log when all audio is loaded (or attempted)
+    Promise.all(audioPromises).then(() => {
+        console.log("Audio preloading complete");
     });
 }
 
 // Create and position stickers on the mandala
 function createStickers() {
+    // Clear container first
+    stickersContainer.innerHTML = '';
+    stickers = [];
+    
     stickerImages.forEach((src, index) => {
         // Find alphabetical position for this sticker
         const alphabeticalPos = alphabeticalOrder.indexOf(index);
@@ -230,10 +274,34 @@ function createStickers() {
         // Create sticker element
         const sticker = document.createElement('div');
         sticker.className = 'sticker';
-        sticker.style.backgroundImage = `url('${src}')`;
         sticker.dataset.id = index;
         sticker.dataset.alphabeticalPos = alphabeticalPos;
         sticker.dataset.name = princessNames[alphabeticalPos] || `Princess ${index + 1}`;
+        
+        // Create image element for better error handling
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = sticker.dataset.name;
+        img.onerror = function() {
+            // Fallback to colored placeholder if image fails to load
+            console.log(`Image failed to load: ${src}`);
+            this.style.display = 'none';
+            sticker.style.backgroundColor = getPrincessColor(alphabeticalPos);
+            sticker.style.borderRadius = '15px';
+            sticker.style.display = 'flex';
+            sticker.style.alignItems = 'center';
+            sticker.style.justifyContent = 'center';
+            
+            // Show initial letter as fallback
+            const initial = document.createElement('div');
+            initial.textContent = sticker.dataset.name.charAt(0);
+            initial.style.fontSize = `${currentStickerSize * 0.4}px`;
+            initial.style.color = 'white';
+            initial.style.fontWeight = 'bold';
+            sticker.appendChild(initial);
+        };
+        
+        sticker.appendChild(img);
         
         // Position sticker on mandala with responsive sizing
         const pos = mandalaPositions[index] || { x: 50, y: 50 };
@@ -288,6 +356,21 @@ function createStickers() {
             handleStickerClick(this);
         }, { passive: false });
         
+        // Add hover effects for desktop
+        sticker.addEventListener('mouseenter', function() {
+            if (!isMobileDevice) {
+                this.style.transform = 'scale(1.1)';
+                this.style.zIndex = '50';
+            }
+        });
+        
+        sticker.addEventListener('mouseleave', function() {
+            if (!isMobileDevice) {
+                this.style.transform = '';
+                this.style.zIndex = '';
+            }
+        });
+        
         // Add to container and array
         stickersContainer.appendChild(sticker);
         stickers.push({
@@ -300,6 +383,82 @@ function createStickers() {
             isLacey: alphabeticalPos === 11 // Mark Lacey sticker
         });
     });
+    
+    console.log(`Created ${stickers.length} stickers`);
+}
+
+// Fallback function if createStickers fails
+function createFallbackStickers() {
+    stickersContainer.innerHTML = '';
+    stickers = [];
+    
+    princessNames.forEach((name, alphabeticalPos) => {
+        const stickerId = alphabeticalOrder[alphabeticalPos];
+        const pos = mandalaPositions[stickerId] || { x: 50, y: 50 };
+        
+        // Create simple colored sticker
+        const sticker = document.createElement('div');
+        sticker.className = 'sticker';
+        sticker.dataset.id = stickerId;
+        sticker.dataset.alphabeticalPos = alphabeticalPos;
+        sticker.dataset.name = name;
+        
+        sticker.style.backgroundColor = getPrincessColor(alphabeticalPos);
+        sticker.style.borderRadius = '15px';
+        sticker.style.display = 'flex';
+        sticker.style.alignItems = 'center';
+        sticker.style.justifyContent = 'center';
+        sticker.style.border = '3px solid white';
+        sticker.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+        
+        const halfSize = currentStickerSize / 2;
+        sticker.style.left = `calc(${pos.x}% - ${halfSize}px)`;
+        sticker.style.top = `calc(${pos.y}% - ${halfSize}px)`;
+        sticker.style.width = `${currentStickerSize}px`;
+        sticker.style.height = `${currentStickerSize}px`;
+        
+        // Show initial letter
+        const initial = document.createElement('div');
+        initial.textContent = name.charAt(0);
+        initial.style.fontSize = `${currentStickerSize * 0.4}px`;
+        initial.style.color = 'white';
+        initial.style.fontWeight = 'bold';
+        sticker.appendChild(initial);
+        
+        // Add label
+        const label = document.createElement('div');
+        label.className = 'sticker-label';
+        label.textContent = name;
+        label.style.bottom = `-${Math.max(22, currentStickerSize * 0.18)}px`;
+        label.style.fontSize = `${Math.max(0.7, currentStickerSize * 0.0065)}rem`;
+        sticker.appendChild(label);
+        
+        // Add click event
+        sticker.addEventListener('click', function() {
+            handleStickerClick(this);
+        });
+        
+        stickersContainer.appendChild(sticker);
+        stickers.push({
+            element: sticker,
+            id: stickerId,
+            alphabeticalPos: alphabeticalPos,
+            name: name,
+            position: pos,
+            audioUrl: princessAudio[alphabeticalPos],
+            isLacey: alphabeticalPos === 11
+        });
+    });
+}
+
+// Helper function to get color for princess
+function getPrincessColor(index) {
+    const colors = [
+        '#FF6B8B', '#4ECDC4', '#FFD166', '#06D6A0',
+        '#118AB2', '#EF476F', '#9D4EDD', '#F15BB5',
+        '#00BBF9', '#00F5D4', '#FF9E00', '#FFD700'
+    ];
+    return colors[index] || '#6C63FF';
 }
 
 // Add audio toggle button to controls
@@ -313,6 +472,23 @@ function addAudioToggle() {
     const audioToggle = document.createElement('button');
     audioToggle.className = 'audio-toggle-btn';
     audioToggle.innerHTML = '🔊 Sound On';
+    
+    // Style the button
+    audioToggle.style.cssText = `
+        background: linear-gradient(to right, #9c27b0, #673ab7);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        margin: 5px;
+    `;
+    
     audioToggle.onclick = toggleAudio;
     
     controls.appendChild(audioToggle);
@@ -327,8 +503,8 @@ function toggleAudio() {
         if (audioEnabled) {
             audioToggle.innerHTML = '🔊 Sound On';
             audioToggle.style.background = 'linear-gradient(to right, #9c27b0, #673ab7)';
-            // Play test sound (use click sound)
-            playSound(soundFiles.click);
+            // Play test sound
+            playSound(soundFiles.click, 0.1);
         } else {
             audioToggle.innerHTML = '🔇 Sound Off';
             audioToggle.style.background = 'linear-gradient(to right, #757575, #9e9e9e)';
@@ -347,6 +523,21 @@ function showAudioFeedback(enabled) {
     
     feedback.textContent = enabled ? '🔊 Audio Enabled' : '🔇 Audio Disabled';
     
+    // Style the feedback
+    feedback.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${enabled ? 'rgba(76, 175, 80, 0.9)' : 'rgba(244, 67, 54, 0.9)'};
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        z-index: 1000;
+        font-weight: bold;
+        animation: fadeInOut 1.5s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    `;
+    
     document.body.appendChild(feedback);
     
     setTimeout(() => {
@@ -361,18 +552,10 @@ function playSound(url, volume = 0.2) {
     try {
         const audio = new Audio(url);
         audio.volume = volume;
+        
         audio.play().catch(e => {
             console.log("Audio play failed for:", url, e);
-            
-            // Try with relative path if absolute fails
-            if (url.startsWith('http')) {
-                const localUrl = url.split('/').pop();
-                const fallbackAudio = new Audio(`sound/${localUrl}`);
-                fallbackAudio.volume = volume;
-                fallbackAudio.play().catch(e2 => {
-                    console.log("Fallback audio also failed:", e2);
-                });
-            }
+            // Silently fail - don't show errors to users
         });
     } catch (e) {
         console.log("Audio error:", e);
@@ -388,9 +571,8 @@ function playPrincessAudio(alphabeticalPos, type = 'correct') {
         
         switch(type) {
             case 'correct':
-                // Play the princess's specific audio (a.mp3, b.mp3, etc.)
                 audioUrl = princessAudio[alphabeticalPos];
-                playSound(audioUrl, 0.25); // Slightly higher volume for correct clicks
+                playSound(audioUrl, 0.25);
                 break;
                 
             case 'error':
@@ -402,14 +584,10 @@ function playPrincessAudio(alphabeticalPos, type = 'correct') {
                 break;
                 
             case 'lacey':
-                // For Lacey's clicks 1 and 2, use the click sound
-                // For click 3, play Lacey's special audio (l.mp3)
                 if (laceyClickCount === 3) {
-                    // 3rd click - play Lacey's special audio
-                    audioUrl = princessAudio[11]; // l.mp3
-                    playSound(audioUrl, 0.3); // Higher volume for special moment
+                    audioUrl = princessAudio[11];
+                    playSound(audioUrl, 0.3);
                 } else {
-                    // 1st and 2nd clicks - use regular click sound
                     playSound(soundFiles.click, 0.2);
                 }
                 break;
@@ -522,7 +700,7 @@ function handleStickerClick(stickerElement) {
             return;
         }
         
-        // CORRECT STICKER - Play princess-specific audio
+        // CORRECT STICKER
         clickedStickers.push(alphabeticalPos);
         stickerElement.classList.add('clicked');
         stickerElement.classList.remove('wrong-order');
@@ -586,7 +764,6 @@ function handleLaceyClick(stickerElement) {
         stickerElement.style.borderColor = '#ffd700';
         stickerElement.style.animation = 'golden-pulse 1s infinite';
         
-        // Note: l.mp3 is already played by playPrincessAudio('lacey')
         createGoldenExplosion(stickerElement);
         
         // Play success sound as well
@@ -973,6 +1150,13 @@ function resetStickers() {
 function addSparkleAnimation() {
     const style = document.createElement('style');
     style.textContent = `
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
+        }
+        
         @keyframes sparkle {
             0% {
                 opacity: 1;
@@ -993,6 +1177,11 @@ function addSparkleAnimation() {
             }
         }
         
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        
         .golden-spark {
             position: absolute;
             border-radius: 50%;
@@ -1001,15 +1190,22 @@ function addSparkleAnimation() {
             z-index: 100;
         }
         
-        /* Mobile-specific animations */
+        .sparkle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 0.5s forwards;
+            z-index: 100;
+        }
+        
+        /* Mobile-specific adjustments */
         @media (max-width: 650px) {
             .sticker {
-                transition: transform 0.2s ease;
+                transition: transform 0.2s ease !important;
             }
             
-            @keyframes gentle-pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.03); }
+            .order-badge {
+                font-size: 0.8rem !important;
             }
         }
         
@@ -1028,3 +1224,4 @@ function addSparkleAnimation() {
 window.resetStickers = resetStickers;
 window.showHint = showHint;
 window.toggleAudio = toggleAudio;
+
