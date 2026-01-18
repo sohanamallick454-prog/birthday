@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Enhanced responsive viewport settings -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>12 Dancing Princesses Mandala</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Add touch icon for mobile -->
+    <link rel="apple-touch-icon" href="images/icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+    <!-- Add loading screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading Princess Magic...</p>
+    </div>
+
+    <div class="header">
+        <h1>12 Dancing Princesses Mandala</h1>
+        <div class="subtitle">Find the princess sequence to unlock the portal ✨ Lacey needs 3 clicks!</div>
+        <div class="credit">Mandala Art © 2012 | Stickers by ayesha_artss | Inspired by Barbie &lt;3</div>
+    </div>
+
+    <!-- Mobile-specific instructions -->
+    <div class="mobile-instructions">
+        <p>👆 <strong>Tap stickers</strong> in alphabetical order</p>
+        <p>📱 <strong>Pinch to zoom</strong> if needed</p>
+    </div>
+
+    <div class="instructions">
+        <p>✨ <strong>How to play:</strong> Click princess stickers in ALPHABETICAL ORDER.</p>
+        <p>When you reach Lacey (last sticker), click her 3 times to unlock her magic!</p>
+        <div id="current-instruction"></div>
+    </div>
+
+    <div class="game-container">
+        <!-- Mandala Background -->
+        <div class="mandala-container">
+            <img src="images/mandala-background.jpg" alt="Mandala with flowers" class="mandala-bg" id="mandalaBg" 
+                 onload="hideLoadingScreen()" onerror="handleImageError()">
+            
+            <!-- Stickers will be positioned here by JavaScript -->
+            <div class="stickers-container" id="stickersContainer"></div>
+        </div>
+
+        <div class="controls">
+            <div class="counter">
+                <span class="counter-text">Progress:</span>
+                <span class="counter-number" id="count">0</span>
+                <span class="counter-total">/ 12</span>
+            </div>
+            <button class="reset-btn" onclick="resetStickers()">Reset All</button>
+            <button class="hint-btn" onclick="showHint()">Show Next</button>
+            <!-- Audio toggle will be added by JavaScript -->
+        </div>
+        
+        <!-- Princess Order Reference - Collapsible on mobile -->
+        <div class="order-reference">
+            <h3 onclick="toggleOrderList()" class="order-toggle">
+                Princess Order (ALPHABETICAL):
+                <span class="toggle-icon">▼</span>
+            </h3>
+            <div class="order-list" id="orderList">
+                <span class="order-item">1. Ashlyn</span>
+                <span class="order-item">2. Blair</span>
+                <span class="order-item">3. Courtney</span>
+                <span class="order-item">4. Deline</span>
+                <span class="order-item">5. Edeline</span>
+                <span class="order-item">6. Fallon</span>
+                <span class="order-item">7. Genevieve</span>
+                <span class="order-item">8. Hadley</span>
+                <span class="order-item">9. Isla</span>
+                <span class="order-item">10. Janessa</span>
+                <span class="order-item">11. Kathleen</span>
+                <span class="order-item">12. Lacey ✨×3</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Follow the princess sequence. Lacey requires triple magic - click her 3 times!</p>
+    </div>
+
+    <!-- Portal overlay (hidden by default) -->
+    <div id="portalOverlay" class="portal-overlay"></div>
+    
+    <!-- Celebration message (hidden by default) -->
+    <div id="celebrationMessage" class="celebration-message">
+        <h2>✨ GOLDEN PORTAL UNLOCKED! ✨</h2>
+        <p>All princesses found in the correct sequence!</p>
+        <p>Lacey's triple magic has opened the portal!</p>
+        <p class="redirect-countdown">Redirecting in <span id="countdown">3</span> seconds...</p>
+    </div>
+
+    <!-- Main game logic -->
+    <script src="script.js"></script>
+    
+    <style>
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #4cc9f0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-screen p {
+            color: #b8c0ff;
+            font-size: 1.2rem;
+        }
+        
+        /* Mobile instructions */
+        .mobile-instructions {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px auto 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .mobile-instructions p {
+            margin: 5px 0;
+        }
+        
+        /* Order list toggle for mobile */
+        .order-toggle {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-icon {
+            font-size: 0.8em;
+            transition: transform 0.3s;
+        }
+        
+        .order-list.collapsed {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin-top: 0;
+        }
+        
+        /* Sticker adjustments for mobile */
+        .sticker {
+            /* Will be dynamically adjusted by JS */
+            width: 120px;
+            height: 120px;
+        }
+        
+        .sticker-label {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+        }
+        
+        /* Orientation warning for mobile */
+        .orientation-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            z-index: 99998;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .orientation-warning p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .orientation-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: rotate 2s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 850px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .instructions {
+                padding: 15px;
+            }
+            
+            .mobile-instructions {
+                display: block;
+            }
+            
+            .order-reference {
+                margin-top: 15px;
+            }
+            
+            .order-item {
+                font-size: 0.85rem;
+                padding: 4px 10px;
+            }
+        }
+        
+        @media (max-width: 650px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle, .credit {
+                font-size: 0.9rem;
+            }
+            
+            .instructions {
+                font-size: 0.9rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .counter, button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            button {
+                padding: 10px;
+            }
+            
+            .order-list {
+                gap: 6px;
+            }
+            
+            .order-item {
+                font-size: 0.8rem;
+                padding: 3px 8px;
+            }
+        }
+        
+        @media (max-width: 450px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .header, .instructions, .footer {
+                padding: 15px;
+            }
+            
+            .order-item {
+                font-size: 0.75rem;
+                padding: 2px 6px;
+            }
+        }
+        
+        /* Portrait orientation optimization */
+        @media (max-height: 700px) and (orientation: portrait) {
+            .header {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .instructions {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .footer {
+                padding: 10px;
+                margin-top: 15px;
+            }
+        }
+        
+        /* Landscape orientation optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                display: none;
+            }
+            
+            .footer {
+                display: none;
+            }
+            
+            .game-container {
+                margin-top: 10px;
+            }
+        }
+        
+        /* Very small devices */
+        @media (max-width: 350px) {
+            .order-list {
+                gap: 4px;
+            }
+            
+            .order-item {
+                font-size: 0.7rem;
+                padding: 2px 5px;
+            }
+            
+            .sticker-label {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+        }
+    </style>
+    
+    <script>
+        // Loading screen functions
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }
+        
+        function handleImageError() {
+            // If background image fails to load, hide loading screen anyway
+            hideLoadingScreen();
+            console.error('Background image failed to load');
+        }
+        
+        // Fallback in case image loads before JS
+        window.addEventListener('load', hideLoadingScreen);
+        
+        // Toggle order list on mobile
+        function toggleOrderList() {
+            const orderList = document.getElementById('orderList');
+            const toggleIcon = document.querySelector('.toggle-icon');
+            
+            if (orderList && toggleIcon) {
+                orderList.classList.toggle('collapsed');
+                toggleIcon.textContent = orderList.classList.contains('collapsed') ? '▶' : '▼';
+            }
+        }
+        
+        // Check if on mobile and collapse order list by default
+        function checkMobileAndCollapse() {
+            if (window.innerWidth <= 650) {
+                const orderList = document.getElementById('orderList');
+                const toggleIcon = document.querySelector('.toggle-icon');
+                
+                if (orderList && toggleIcon) {
+                    orderList.classList.add('collapsed');
+                    toggleIcon.textContent = '▶';
+                }
+            }
+        }
+        
+        // Check orientation and show warning if needed
+        function checkOrientation() {
+            const orientationWarning = document.createElement('div');
+            orientationWarning.className = 'orientation-warning';
+            orientationWarning.innerHTML = `
+                <div class="orientation-icon">📱</div>
+                <p>For best experience, please rotate your device to landscape mode</p>
+            `;
+            document.body.appendChild(orientationWarning);
+            
+            function updateOrientation() {
+                if (window.innerHeight > window.innerWidth && window.innerWidth < 768) {
+                    orientationWarning.style.display = 'flex';
+                } else {
+                    orientationWarning.style.display = 'none';
+                }
+            }
+            
+            updateOrientation();
+            window.addEventListener('resize', updateOrientation);
+            window.addEventListener('orientationchange', updateOrientation);
+        }
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            checkMobileAndCollapse();
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                checkOrientation();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy 21st Birthday Simi</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: linear-gradient(#ffe6f0, #fff);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        overflow: hidden;
+        font-family: 'Comic Sans MS', cursive;
+    }
+
+    .cake-container {
+        position: relative;
+        width: 260px;
+        height: 300px;
+    }
+
+    .layer {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 60px;
+        background: chocolate;
+        border-radius: 12px;
+        opacity: 0;
+        box-shadow: inset 0 -6px rgba(255,255,255,0.2);
+    }
+
+    .layer::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 0;
+        width: 100%;
+        height: 18px;
+        background: #f7b7c9;
+        border-radius: 12px;
+    }
+
+    /* Layer sizes & final positions */
+    .layer1 {
+        width: 240px;
+        bottom: 0;
+    }
+
+    .layer2 {
+        width: 200px;
+        bottom: 70px;
+    }
+
+    .layer3 {
+        width: 160px;
+        bottom: 140px;
+    }
+
+    .fall {
+        animation: fall 1s ease forwards;
+    }
+
+    @keyframes fall {
+        from {
+            transform: translate(-50%, -300px);
+            opacity: 1;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+
+    /* Candle */
+    .candle {
+        position: absolute;
+        width: 12px;
+        height: 40px;
+        background: #fff;
+        left: 50%;
+        bottom: 210px;
+        transform: translateX(-50%);
+        border-radius: 6px;
+        opacity: 0;
+    }
+
+    .flame {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        width: 14px;
+        height: 18px;
+        background: orange;
+        border-radius: 50%;
+        transform: translateX(-50%);
+        animation: flicker 0.8s infinite alternate;
+    }
+
+    @keyframes flicker {
+        from { transform: translateX(-50%) scale(1); }
+        to { transform: translateX(-50%) scale(1.2); }
+    }
+
+    .show {
+        animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+
+    .text {
+        margin-top: 30px;
+        font-size: 32px;
+        color: #b03060;
+        opacity: 0;
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="cake-container">
+    <div class="layer layer1"></div>
+    <div class="layer layer2"></div>
+    <div class="layer layer3"></div>
+
+    <div class="candle" id="candle">
+        <div class="flame"></div>
+    </div>
+</div>
+
+<div class="text" id="birthdayText">
+    🎉 HAPPY 21st BIRTHDAY SIMI 🎉
+</div>
+
+<script>
+    const layer1 = document.querySelector('.layer1');
+    const layer2 = document.querySelector('.layer2');
+    const layer3 = document.querySelector('.layer3');
+    const candle = document.getElementById('candle');
+    const text = document.getElementById('birthdayText');
+
+    setTimeout(() => layer1.classList.add('fall'), 500);
+    setTimeout(() => layer2.classList.add('fall'), 1500);
+    setTimeout(() => layer3.classList.add('fall'), 2500);
+
+    setTimeout(() => candle.classList.add('show'), 3500);
+    setTimeout(() => text.classList.add('show'), 4500);
+</script>
+
+</body>
+</html>
+

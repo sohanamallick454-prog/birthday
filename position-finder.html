@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandala Sticker Position Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        
+        h1 {
+            color: #ffd6ff;
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .mandala-section {
+            flex: 1;
+            min-width: 600px;
+        }
+        
+        .mandala-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            border: 3px solid #4cc9f0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        #mandalaImg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: crosshair;
+        }
+        
+        .coordinate-marker {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #f72585;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+        
+        .marker-number {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .controls-section {
+            flex: 1;
+            min-width: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .counter {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(76, 201, 240, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .counter-number {
+            color: #4cc9f0;
+            font-weight: bold;
+            font-size: 2rem;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .coordinates-list {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .coordinate-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4361ee;
+            transition: all 0.3s;
+        }
+        
+        .coordinate-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .sticker-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .sticker-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #f72585, #b5179e);
+            color: white;
+        }
+        
+        .export-btn {
+            background: linear-gradient(to right, #4cc9f0, #4895ef);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hint {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(76, 201, 240, 0.1);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #b8c0ff;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .mandala-section, .controls-section {
+                min-width: 100%;
+            }
+            
+            .mandala-container {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1/1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mandala Sticker Position Finder</h1>
+            <p>Click on the mandala where each princess sticker should go. Follow the numbered order.</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="mandala-section">
+                <div class="counter">
+                    Stickers Placed: <span class="counter-number" id="clickCount">0</span>/12
+                </div>
+                
+                <div class="mandala-container">
+                    <img src="images/mandala-background.jpg" id="mandalaImg" alt="Mandala Background">
+                    <!-- Markers will appear here -->
+                </div>
+                
+                <div class="hint">
+                    💡 <strong>Tip:</strong> Zoom in your browser (Ctrl+) for more precise clicking. 
+                    Aim for the center of each flower where the sticker should go.
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <div class="instructions">
+                    <h3>How to Use:</h3>
+                    <ol>
+                        <li><strong>Click the center flower</strong> first (sticker 1)</li>
+                        <li><strong>Click the inner ring flowers</strong> (stickers 2-5)</li>
+                        <li><strong>Click the middle ring flowers</strong> (stickers 6-9)</li>
+                        <li><strong>Click the outer ring flowers</strong> (stickers 10-12)</li>
+                    </ol>
+                    <p>Follow the natural pattern of your mandala's flowers.</p>
+                </div>
+                
+                <div class="coordinates-list" id="coordList">
+                    <h4>Coordinates Collected:</h4>
+                    <!-- Coordinates will appear here -->
+                </div>
+                
+                <div class="buttons">
+                    <button class="copy-btn" onclick="copyCoordinates()">📋 Copy Coordinates</button>
+                    <button class="export-btn" onclick="exportToJS()">📁 Export to script.js</button>
+                    <button class="reset-btn" onclick="resetCoordinates()">🔄 Reset All</button>
+                </div>
+                
+                <div class="hint">
+                    <strong>After copying:</strong> Paste the coordinates into your <code>script.js</code> file, 
+                    replacing the <code>mandalaPositions</code> array.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Color palette for sticker previews
+        const stickerColors = [
+            '#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2',
+            '#EF476F', '#FFD166', '#06D6A0', '#073B4C', '#7209B7',
+            '#3A86FF', '#FB5607'
+        ];
+        
+        // Princess names for reference
+        const princessNames = [
+            "Ashlyn", "Blair", "Courtney", "Deline", "Edeline", "Fallon",
+            "Genevieve", "Hadley", "Isla", "Janessa", "Kathleen", "Lacey"
+        ];
+        
+        const mandalaImg = document.getElementById('mandalaImg');
+        const coordList = document.getElementById('coordList');
+        const clickCountElement = document.getElementById('clickCount');
+        
+        let coordinates = [];
+        let markers = [];
+        
+        mandalaImg.addEventListener('click', function(event) {
+            if (coordinates.length >= 12) {
+                alert('✅ All 12 coordinates collected! Click "Copy Coordinates" to copy them.');
+                return;
+            }
+            
+            const rect = mandalaImg.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Convert to percentage (rounded to 1 decimal)
+            const xPercent = Math.round((x / rect.width) * 1000) / 10;
+            const yPercent = Math.round((y / rect.height) * 1000) / 10;
+            
+            // Save coordinate
+            const coord = { 
+                x: xPercent, 
+                y: yPercent,
+                stickerNumber: coordinates.length + 1
+            };
+            coordinates.push(coord);
+            
+            // Create visual marker
+            createMarker(x, y, coordinates.length);
+            
+            // Add to coordinates list
+            addToCoordinatesList(coord, coordinates.length);
+            
+            // Update counter
+            clickCountElement.textContent = coordinates.length;
+            
+            // Show completion message
+            if (coordinates.length === 12) {
+                setTimeout(() => {
+                    alert('🎉 Perfect! You placed all 12 stickers.\n\nClick "Export to script.js" to generate the complete code.');
+                }, 300);
+            }
+        });
+        
+        function createMarker(x, y, number) {
+            const marker = document.createElement('div');
+            marker.className = 'coordinate-marker';
+            marker.style.left = x + 'px';
+            marker.style.top = y + 'px';
+            
+            // Add number label
+            const numberLabel = document.createElement('div');
+            numberLabel.className = 'marker-number';
+            numberLabel.textContent = number;
+            marker.appendChild(numberLabel);
+            
+            document.querySelector('.mandala-container').appendChild(marker);
+            markers.push(marker);
+        }
+        
+        function addToCoordinatesList(coord, number) {
+            const coordItem = document.createElement('div');
+            coordItem.className = 'coordinate-item';
+            
+            const stickerColor = stickerColors[number - 1] || '#CCCCCC';
+            
+            coordItem.innerHTML = `
+                <div style="font-weight: bold;">#${number} - ${princessNames[number - 1] || `Princess ${number}`}</div>
+                <div>X: ${coord.x}% | Y: ${coord.y}%</div>
+                <div class="sticker-preview">
+                    <div class="sticker-color" style="background: ${stickerColor};"></div>
+                    <div style="font-size: 0.9rem; color: #b8c0ff;">
+                        { x: ${coord.x}, y: ${coord.y} }
+                    </div>
+                </div>
+            `;
+            
+            coordList.appendChild(coordItem);
+        }
+        
+        function copyCoordinates() {
+            if (coordinates.length === 0) {
+                alert('No coordinates to copy! Click on the mandala first.');
+                return;
+            }
+            
+            const coordString = coordinates.map((coord, index) => 
+                `    { x: ${coord.x}, y: ${coord.y} }, // Sticker ${index + 1}: ${princessNames[index] || `Princess ${index + 1}`}`
+            ).join('\n');
+            
+            const fullCode = `// Mandala Sticker Positions\n// Generated with Position Finder\nconst mandalaPositions = [\n${coordString}\n];`;
+            
+            navigator.clipboard.writeText(fullCode).then(() => {
+                alert('✅ Coordinates copied to clipboard!\n\nPaste this into your script.js file, replacing the mandalaPositions array.');
+            }).catch(err => {
+                // Fallback for browsers without clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = fullCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Coordinates copied!');
+            });
+        }
+        
+        function exportToJS() {
+            if (coordinates.length === 0) {
+                alert('No coordinates to export!');
+                return;
+            }
+            
+            const jsContent = `// script.js - Mandala Princess Sticker Game
+// Generated on ${new Date().toLocaleDateString()}
+
+// Your sticker images - UPDATE THESE PATHS
+const stickerImages = [
+    'images/sticker1.png',
+    'images/sticker2.png',
+    'images/sticker3.png',
+    'images/sticker4.png',
+    'images/sticker5.png',
+    'images/sticker6.png',
+    'images/sticker7.png',
+    'images/sticker8.png',
+    'images/sticker9.png',
+    'images/sticker10.png',
+    'images/sticker11.png',
+    'images/sticker12.png'
+];
+
+// Princess names
+const princessNames = [
+    "Ashlyn", "Blair", "Courtney", "Deline", "Edeline", "Fallon",
+    "Genevieve", "Hadley", "Isla", "Janessa", "Kathleen", "Lacey"
+];
+
+// Mandala Sticker Positions - AUTO-GENERATED
+const mandalaPositions = [
+${coordinates.map((coord, index) => `    { x: ${coord.x}, y: ${coord.y} }, // ${princessNames[index] || `Princess ${index + 1}`}`).join('\n')}
+];
+
+// ... rest of your script.js code ...
+`;
+
+            // Create download link
+            const blob = new Blob([jsContent], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'script-with-positions.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ script-with-positions.js downloaded!\n\nReplace your script.js with this file, or copy the positions array.');
+        }
+        
+        function resetCoordinates() {
+            if (coordinates.length > 0 && !confirm('Are you sure you want to reset all coordinates?')) {
+                return;
+            }
+            
+            coordinates = [];
+            markers.forEach(marker => marker.remove());
+            markers = [];
+            coordList.innerHTML = '<h4>Coordinates Collected:</h4>';
+            clickCountElement.textContent = '0';
+        }
+        
+        // Handle image load errors
+        mandalaImg.onerror = function() {
+            alert('❌ Could not load mandala image!\n\nMake sure "images/mandala-background.jpg" exists in the images folder.');
+        };
+        
+        // Initial message
+        console.log('Position Finder loaded. Click on the mandala image to place stickers.');
+    </script>
+</body>
+</html>
